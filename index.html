@@ -197,12 +197,17 @@
   }
 
   async function ejecutarConsulta(serviceId) {
-    const imei = (serviceId === 'demo') 
-      ? document.getElementById("imeiModelo").value.trim()
-      : document.getElementById("imeiIcloud").value.trim();
+    const rawInput = (serviceId === 'demo') 
+      ? document.getElementById("imeiModelo").value
+      : document.getElementById("imeiIcloud").value;
 
-    if (!imei) {
-      alert("⚠️ Ingresa un IMEI o Serial válido.");
+    const imei = rawInput.trim();
+
+    // Valida que sean exactamente 15 dígitos numéricos (0-9)
+    const regexImei = /^\d{15}$/;
+
+    if (!regexImei.test(imei)) {
+      alert("⚠️ Ingresa un IMEI válido de exactamente 15 números (sin letras ni espacios).");
       return;
     }
 
@@ -219,6 +224,7 @@
     } catch (err) {
       resContent.innerText = "❌ Error de conexión al consultar el servicio.";
     }
+  }
   }
 </script>
 </body>
