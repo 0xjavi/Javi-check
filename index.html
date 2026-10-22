@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>0xJavi - Portal de Chequeos</title>
+
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="0xJavi Check">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href='data:application/manifest+json;utf-8,{"name":"0xJavi Check","short_name":"0xJavi","display":"standalone","background_color":"#121212","theme_color":"#000000"}'>
+
+<style>
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+    margin: 0; padding: 0; background-color: #0d1117; color: #e0e0e0; 
+  }
+  
+  .matrix-banner {
+    background-color: #000000;
+    padding: 30px 15px 20px 15px;
+    text-align: center;
+    border-bottom: 2px solid #00e676;
+    box-shadow: 0 0 25px rgba(0, 230, 118, 0.25);
+    margin-bottom: 25px;
+  }
+  
+  .matrix-title {
+    color: #00e676;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 3px;
+    text-shadow: 0 0 5px #00e676, 0 0 15px #00e676;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 12px;
+    height: 26px;
+    background-color: #00e676;
+    margin-left: 6px;
+    box-shadow: 0 0 8px #00e676;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  .creditos { text-align: center; margin-top: 10px; color: #8b949e; font-size: 13px; }
+  .creditos a { color: #00e676; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  
+  .container {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 12px 30px 12px;
+  }
+
+  .panel-api {
+    background: #161b22; padding: 20px; margin-bottom: 18px; 
+    border-radius: 12px; border: 1px solid #30363d; 
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+  .panel-api h3 { margin-top: 0; margin-bottom: 15px; color: #fff; font-size: 16px; }
+  
+  .api-controls { display: flex; flex-direction: column; gap: 12px; }
+  .api-controls input {
+    width: 100%; padding: 13px; border-radius: 8px; border: 1px solid #30363d; 
+    background: #0d1117; color: white; outline: none; font-size: 14px; box-sizing: border-box;
+  }
+  .api-controls input:focus { border: 1px solid #00e676; }
+  
+  .btn {
+    width: 100%; padding: 13px 20px; border: none; 
+    border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn:active { opacity: 0.85; }
+  .btn-modelo { background: #00e676; color: #000; }
+  .btn-icloud { background: #3498db; color: #fff; }
+  .btn-desbloquear { background: #e74c3c; color: #fff; }
+
+  .bloque-candado {
+    background: rgba(231, 76, 60, 0.08);
+    border: 1px dashed #e74c3c;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  #resultado-box {
+    display: none;
+    background: #000000;
+    border: 1px solid #00e676;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    color: #00e676;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.15);
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="matrix-banner">
+  <div class="matrix-title">
+    0xJAVI<span class="cursor"></span>
+  </div>
+  <div class="creditos">
+    Soporte Técnico • <a href="https://wa.me/56920262611" target="_blank">WhatsApp</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- PANEL 1: CHECK MODELO -->
+  <div class="panel-api">
+    <h3>📱 Check Modelo (Básico)</h3>
+    <div class="api-controls">
+      <input type="text" id="imeiModelo" placeholder="Ingresa el IMEI o Serial...">
+      <button class="btn btn-modelo" onclick="ejecutarConsulta('demo')">Consultar Modelo</button>
+    </div>
+  </div>
+
+  <!-- PANEL 2: CHECK iCLOUD -->
+  <div class="panel-api">
+    <h3>🔒 Check de iCloud / FMI (Pro)</h3>
+    
+    <div id="seccion-candado" class="bloque-candado">
+      <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8787;">
+        Ingresa tu clave de acceso para desbloquear este chequeo.
+      </p>
+      <div class="api-controls">
+        <input type="password" id="llaveAcceso" placeholder="Clave de acceso...">
+        <button class="btn btn-desbloquear" onclick="activarModoPro()">Desbloquear 🔓</button>
+      </div>
+    </div>
+
+    <div id="seccion-icloud-activa" style="display: none;" class="api-controls">
+      <input type="text" id="imeiIcloud" placeholder="Ingresa el IMEI o Serial...">
+      <button class="btn btn-icloud" onclick="ejecutarConsulta('3')">Consultar Estado iCloud</button>
+    </div>
+  </div>
+
+  <!-- RESULTADO -->
+  <div id="resultado-box">
+    <div style="border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 10px; font-weight: bold; color: #fff;">
+      > RESPUESTA DEL SERVIDOR:
+    </div>
+    <div id="resultado-contenido">Cargando...</div>
+  </div>
+
+</div>
+
+<script>
+  const WORKER_URL = "https://javicheck.javiersuarezvillasmi.workers.dev";
+  let tokenAutorizado = "";
+
+  function activarModoPro() {
+    const inputKey = document.getElementById("llaveAcceso").value.trim();
+    if (!inputKey) {
+      alert("⚠️ Ingresa la clave.");
+      return;
+    }
+    tokenAutorizado = inputKey;
+    document.getElementById("seccion-candado").style.display = "none";
+    document.getElementById("seccion-icloud-activa").style.display = "flex";
+  }
+
+  async function ejecutarConsulta(serviceId) {
+    const imei = (serviceId === 'demo') 
+      ? document.getElementById("imeiModelo").value.trim()
+      : document.getElementById("imeiIcloud").value.trim();
+
+    if (!imei) {
+      alert("⚠️ Ingresa un IMEI o Serial válido.");
+      return;
+    }
+
+    const resBox = document.getElementById("resultado-box");
+    const resContent = document.getElementById("resultado-contenido");
+    resBox.style.display = "block";
+    resContent.innerText = "⏳ Consultando servidor seguro...";
+
+    try {
+      const url = `${WORKER_URL}?imei=${encodeURIComponent(imei)}&service=${encodeURIComponent(serviceId)}&auth=${encodeURIComponent(tokenAutorizado)}`;
+      const response = await fetch(url);
+      const data = await response.text();
+      resContent.innerHTML = data;
+    } catch (err) {
+      resContent.innerText = "❌ Error de conexión al consultar el servicio.";
+    }
+  }
+</script>
+</body>
+</html>
