@@ -164,15 +164,36 @@
   const WORKER_URL = "https://javicheck.javiersuarezvillasmil.workers.dev";
   let tokenAutorizado = "";
 
-  function activarModoPro() {
+  async function activarModoPro() {
     const inputKey = document.getElementById("llaveAcceso").value.trim();
+    const btnLock = document.querySelector(".btn-desbloquear");
+
     if (!inputKey) {
-      alert("⚠️ Ingresa la clave.");
+      alert("⚠️ Ingresa una clave.");
       return;
     }
-    tokenAutorizado = inputKey;
-    document.getElementById("seccion-candado").style.display = "none";
-    document.getElementById("seccion-icloud-activa").style.display = "flex";
+
+    btnLock.innerText = "Verificando... ⏳";
+    btnLock.disabled = true;
+
+    try {
+      const url = `${WORKER_URL}?service=verificar&auth=${encodeURIComponent(inputKey)}`;
+      const res = await fetch(url);
+
+      if (res.ok) {
+        tokenAutorizado = inputKey;
+        document.getElementById("seccion-candado").style.display = "none";
+        document.getElementById("seccion-icloud-activa").style.display = "flex";
+      } else {
+        alert("❌ Clave incorrecta. Acceso denegado.");
+        document.getElementById("llaveAcceso").value = "";
+      }
+    } catch (err) {
+      alert("⚠️ Error de conexión al validar la clave con el servidor.");
+    } finally {
+      btnLock.innerText = "Desbloquear 🔓";
+      btnLock.disabled = false;
+    }
   }
 
   async function ejecutarConsulta(serviceId) {
