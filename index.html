@@ -61,7 +61,6 @@
     padding: 0 12px 30px 12px;
   }
 
-  /* BANNER PROMO SERVICIO REMOTO USB */
   .banner-remoto {
     background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
     border: 1px solid #00e676;
@@ -177,47 +176,35 @@
 
 <div class="container">
 
-  <!-- BANNER SERVICIO REMOTO USB -->
   <div class="banner-remoto">
     <h4>⚡ Servicio Técnico Remoto USB</h4>
-    <p>
-      ¿Necesitas un desbloqueo a distancia? <b>usb.0xjavi.vip</b> cero configuraciones complicadas.
-    </p>
-    <a href="https://wa.me/56920262611?text=Hola%20Javi,%20necesito%20soporte%20remoto%20vía%20USB" target="_blank" class="btn-remoto">
-      Solicitar Conexión Remota
-    </a>
+    <p>¿Necesitas flasheo, lectura de puertos o soporte a distancia? Conecta tu equipo vía <b>usb.0xjavi.vip</b> sin configuraciones complicadas.</p>
+    <a href="https://wa.me/56920262611?text=Hola%20Javi,%20necesito%20soporte%20remoto%20vía%20USB" target="_blank" class="btn-remoto">Solicitar Conexión Remota</a>
   </div>
 
-  <!-- PANEL 1: CHECK MODELO -->
   <div class="panel-api">
     <h3>📱 Check Modelo (Básico)</h3>
     <div class="api-controls">
-      <input type="text" id="imeiModelo" maxlength="15" inputmode="numeric" placeholder="Ingresa los 15 dígitos del IMEI...">
+      <input type="text" id="imeiModelo" maxlength="15" placeholder="Ingresa IMEI (15 núm) o Serial (10-12)..." style="text-transform: uppercase;">
       <button class="btn btn-modelo" onclick="ejecutarConsulta('demo')">Consultar Modelo</button>
     </div>
   </div>
 
-  <!-- PANEL 2: CHECK iCLOUD -->
   <div class="panel-api">
     <h3>🔒 Check de iCloud / FMI (Pro)</h3>
-    
     <div id="seccion-candado" class="bloque-candado">
-      <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8787;">
-        Ingresa tu clave de acceso para desbloquear este chequeo.
-      </p>
+      <p style="margin: 0 0 12px 0; font-size: 13px; color: #ff8787;">Ingresa tu clave de acceso para desbloquear este chequeo.</p>
       <div class="api-controls">
         <input type="password" id="llaveAcceso" placeholder="Clave de acceso...">
         <button class="btn btn-desbloquear" onclick="activarModoPro()">Desbloquear 🔓</button>
       </div>
     </div>
-
     <div id="seccion-icloud-activa" style="display: none;" class="api-controls">
-      <input type="text" id="imeiIcloud" maxlength="15" inputmode="numeric" placeholder="Ingresa los 15 dígitos del IMEI...">
+      <input type="text" id="imeiIcloud" maxlength="15" placeholder="Ingresa IMEI (15 núm) o Serial (10-12)..." style="text-transform: uppercase;">
       <button class="btn btn-icloud" onclick="ejecutarConsulta('3')">Consultar Estado iCloud</button>
     </div>
   </div>
 
-  <!-- RESULTADO -->
   <div id="resultado-box">
     <div style="border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 10px; font-weight: bold; color: #fff;">
       > RESPUESTA DEL SERVIDOR:
@@ -231,11 +218,7 @@
   const WORKER_URL = "https://javicheck.javiersuarezvillasmil.workers.dev";
   let tokenAutorizado = "";
 
-  // Función matemática oficial (Algoritmo de Luhn) para validar IMEIs reales
   function esImeiReal(imei) {
-    if (!/^\d{15}$/.test(imei)) return false;
-    if (/^(\d)\1{14}$/.test(imei)) return false; // Rechaza 15 números iguales (ej: 777777777777777)
-    
     let suma = 0;
     for (let i = 0; i < 15; i++) {
       let digito = parseInt(imei.charAt(i), 10);
@@ -285,15 +268,17 @@
       ? document.getElementById("imeiModelo").value
       : document.getElementById("imeiIcloud").value;
 
-    const imei = rawInput.trim();
+    const imeiOSerial = rawInput.trim().toUpperCase();
+    let entradaValida = false;
 
-    if (!/^\d{15}$/.test(imei)) {
-      alert("⚠️ Ingresa exactamente 15 números (sin letras ni espacios).");
-      return;
+    if (/^\d{15}$/.test(imeiOSerial) && !/^(\d)\1{14}$/.test(imeiOSerial)) {
+      entradaValida = esImeiReal(imeiOSerial);
+    } else if (/^[A-Z0-9]{10,12}$/.test(imeiOSerial)) {
+      entradaValida = true;
     }
 
-    if (!esImeiReal(imei)) {
-      alert("⚠️ El IMEI ingresado es falso o tiene un dígito mal escrito. Verifica el número (*#06#).");
+    if (!entradaValida) {
+      alert("⚠️ Ingresa un IMEI válido (15 números) o un Serial (10 a 12 letras/números).");
       return;
     }
 
@@ -303,7 +288,7 @@
     resContent.innerText = "⏳ Consultando servidor seguro...";
 
     try {
-      const url = `${WORKER_URL}?imei=${encodeURIComponent(imei)}&service=${encodeURIComponent(serviceId)}&auth=${encodeURIComponent(tokenAutorizado)}`;
+      const url = `${WORKER_URL}?imei=${encodeURIComponent(imeiOSerial)}&service=${encodeURIComponent(serviceId)}&auth=${encodeURIComponent(tokenAutorizado)}`;
       const response = await fetch(url);
       const data = await response.text();
       resContent.innerHTML = data;
