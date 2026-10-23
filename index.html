@@ -192,7 +192,7 @@
   <div class="panel-api">
     <h3>📱 Check Modelo (Básico)</h3>
     <div class="api-controls">
-      <input type="text" id="imeiModelo" maxlength="15" placeholder="Ingresa los 15 dígitos del IMEI...">
+      <input type="text" id="imeiModelo" maxlength="15" inputmode="numeric" placeholder="Ingresa los 15 dígitos del IMEI...">
       <button class="btn btn-modelo" onclick="ejecutarConsulta('demo')">Consultar Modelo</button>
     </div>
   </div>
@@ -212,7 +212,7 @@
     </div>
 
     <div id="seccion-icloud-activa" style="display: none;" class="api-controls">
-      <input type="text" id="imeiIcloud" maxlength="15" placeholder="Ingresa los 15 dígitos del IMEI...">
+      <input type="text" id="imeiIcloud" maxlength="15" inputmode="numeric" placeholder="Ingresa los 15 dígitos del IMEI...">
       <button class="btn btn-icloud" onclick="ejecutarConsulta('3')">Consultar Estado iCloud</button>
     </div>
   </div>
@@ -230,6 +230,23 @@
 <script>
   const WORKER_URL = "https://javicheck.javiersuarezvillasmil.workers.dev";
   let tokenAutorizado = "";
+
+  // Función matemática oficial (Algoritmo de Luhn) para validar IMEIs reales
+  function esImeiReal(imei) {
+    if (!/^\d{15}$/.test(imei)) return false;
+    if (/^(\d)\1{14}$/.test(imei)) return false; // Rechaza 15 números iguales (ej: 777777777777777)
+    
+    let suma = 0;
+    for (let i = 0; i < 15; i++) {
+      let digito = parseInt(imei.charAt(i), 10);
+      if (i % 2 === 1) {
+        digito *= 2;
+        if (digito > 9) digito -= 9;
+      }
+      suma += digito;
+    }
+    return (suma % 10 === 0);
+  }
 
   async function activarModoPro() {
     const inputKey = document.getElementById("llaveAcceso").value.trim();
@@ -270,11 +287,13 @@
 
     const imei = rawInput.trim();
 
-    // Valida que sean exactamente 15 números (0-9)
-    const regexImei = /^\d{15}$/;
+    if (!/^\d{15}$/.test(imei)) {
+      alert("⚠️ Ingresa exactamente 15 números (sin letras ni espacios).");
+      return;
+    }
 
-    if (!regexImei.test(imei)) {
-      alert("⚠️ Ingresa un IMEI válido de exactamente 15 números (sin letras ni espacios).");
+    if (!esImeiReal(imei)) {
+      alert("⚠️ El IMEI ingresado es falso o tiene un dígito mal escrito. Verifica el número (*#06#).");
       return;
     }
 
