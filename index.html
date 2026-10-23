@@ -61,6 +61,62 @@
     padding: 0 12px 30px 12px;
   }
 
+  /* BANNER PROMO SERVICIO REMOTO USB */
+  .banner-remoto {
+    background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+    border: 1px solid #00e676;
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.15);
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-remoto::before {
+    content: "ONLINE";
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #000;
+    background: #00e676;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+  .banner-remoto h4 {
+    margin: 0 0 8px 0;
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .banner-remoto p {
+    margin: 0 0 14px 0;
+    color: #8b949e;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .btn-remoto {
+    background: transparent;
+    color: #00e676;
+    border: 1px solid #00e676;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    box-sizing: border-box;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: background 0.2s;
+  }
+  .btn-remoto:active {
+    background: rgba(0, 230, 118, 0.15);
+  }
+
   .panel-api {
     background: #161b22; padding: 20px; margin-bottom: 18px; 
     border-radius: 12px; border: 1px solid #30363d; 
@@ -121,11 +177,22 @@
 
 <div class="container">
 
+  <!-- BANNER SERVICIO REMOTO USB -->
+  <div class="banner-remoto">
+    <h4>⚡ Servicio Técnico Remoto USB</h4>
+    <p>
+      ¿Necesitas flasheo, lectura de puertos o soporte a distancia? Conecta tu equipo vía <b>usb.0xjavi.vip</b> sin configuraciones complicadas.
+    </p>
+    <a href="https://wa.me/56920262611?text=Hola%20Javi,%20necesito%20soporte%20remoto%20vía%20USB" target="_blank" class="btn-remoto">
+      Solicitar Conexión Remota
+    </a>
+  </div>
+
   <!-- PANEL 1: CHECK MODELO -->
   <div class="panel-api">
     <h3>📱 Check Modelo (Básico)</h3>
     <div class="api-controls">
-      <input type="text" id="imeiModelo" placeholder="Ingresa el IMEI o Serial...">
+      <input type="text" id="imeiModelo" maxlength="15" placeholder="Ingresa los 15 dígitos del IMEI...">
       <button class="btn btn-modelo" onclick="ejecutarConsulta('demo')">Consultar Modelo</button>
     </div>
   </div>
@@ -145,7 +212,7 @@
     </div>
 
     <div id="seccion-icloud-activa" style="display: none;" class="api-controls">
-      <input type="text" id="imeiIcloud" placeholder="Ingresa el IMEI o Serial...">
+      <input type="text" id="imeiIcloud" maxlength="15" placeholder="Ingresa los 15 dígitos del IMEI...">
       <button class="btn btn-icloud" onclick="ejecutarConsulta('3')">Consultar Estado iCloud</button>
     </div>
   </div>
@@ -203,7 +270,7 @@
 
     const imei = rawInput.trim();
 
-    // Valida que sean exactamente 15 dígitos numéricos (0-9)
+    // Valida que sean exactamente 15 números (0-9)
     const regexImei = /^\d{15}$/;
 
     if (!regexImei.test(imei)) {
@@ -224,7 +291,6 @@
     } catch (err) {
       resContent.innerText = "❌ Error de conexión al consultar el servicio.";
     }
-  }
   }
 </script>
 </body>
